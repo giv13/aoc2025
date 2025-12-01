@@ -1,16 +1,12 @@
-import java.util.function.Supplier;
-
 public class Main {
-    public static void main(String[] args) {
-        Day1 day1 = new Day1("files/day1.txt");
-        print("1/1", day1::getActualPasswordWithOldMethod);
-        print("1/2", day1::getActualPasswordWithNewMethod);
-    }
+    private static final int DAYS_COUNT = 1;
 
-    private static void print(String day, Supplier<?> supplier) {
-        long startTime = System.nanoTime();
-        String result = String.valueOf(supplier.get());
-        long endTime = System.nanoTime();
-        System.out.println("Day " + day + ": " + result + " (" + (double) ((endTime - startTime) / 1000000) / 1000 + " мс)");
+    public static void main(String[] args) throws Exception {
+        Day day;
+        for (int i = 1; i <= DAYS_COUNT; i++) {
+            Class<?> clazz = Class.forName("Day" + i);
+            day = (Day) clazz.getDeclaredConstructor(new Class[]{String.class}).newInstance("files/day" + i + ".txt");
+            day.solve();
+        }
     }
 }

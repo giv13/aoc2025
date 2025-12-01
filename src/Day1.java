@@ -9,11 +9,10 @@ public class Day1 extends Day {
 
     public Day1(String filePath) {
         super(filePath);
-        readFile();
     }
 
     @Override
-    protected void processLine(String line) {
+    void processLine(String line) {
         String regex = "^([LR])(\\d+)$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(line);
@@ -26,18 +25,20 @@ public class Day1 extends Day {
         }
     }
 
-    public int getActualPasswordWithOldMethod() {
+    @Override
+    Integer part1() {
         // Прибавляем 1, если диск после поворота будет в положении 0
         return getActualPassword((dial, rotation) -> (dial + rotation) % 100 == 0 ? 1 : 0);
     }
 
-    public int getActualPasswordWithNewMethod() {
+    @Override
+    Integer part2() {
         // Вычисляем, сколько полных оборотов пройдет диск после поворота
         // К результату прибавляем 1, если диск после поворота будет в положении 0 или пройдет через 0
         return getActualPassword((dial, rotation) -> Math.abs((dial + rotation) / 100) + (dial == -rotation || dial * (dial + rotation) < 0 ? 1 : 0));
     }
 
-    public int getActualPassword(IntBinaryOperator method) {
+    private int getActualPassword(IntBinaryOperator method) {
         int dial = 50;
         int actualPassword = 0;
         for (int rotation : rotations) {
