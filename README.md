@@ -1,5 +1,5 @@
 # Advent of Code 2025
 
-| Day                                          | Features |
-|----------------------------------------------|----------|
-| [Day 1](https://adventofcode.com/2025/day/1) | Regex    |
+| Day | Problem                                                | Solution                | Features                          |
+|-----|--------------------------------------------------------|-------------------------|-----------------------------------|
+| 1   | [Secret Entrance](https://adventofcode.com/2025/day/1) | [Source](src/Day1.java) | Regex, IntBinaryOperator + Lambda |
