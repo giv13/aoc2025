@@ -21,12 +21,12 @@ public class Day2 extends Day {
     @Override
     Long part1() {
         return getSumOfInvalidIds((idStr) -> {
-            // Строка не делится пополам - ID валидный
+            // Skip odd-length strings that can't have equal halves - ID is valid
             if (idStr.length() % 2 != 0) {
                 return true;
             }
 
-            // Две части одинаковые - ID невалидный
+            // Two halves are equal - ID is invalid
             int halfPos = idStr.length() / 2;
             return !idStr.substring(0, halfPos).equals(idStr.substring(halfPos));
         });
@@ -35,29 +35,29 @@ public class Day2 extends Day {
     @Override
     Object part2() {
         return getSumOfInvalidIds((idStr) -> {
-            // Проверяем все возможные размеры повторяющихся подстрок
-            for (int partSize = idStr.length() / 2; partSize >= 1; partSize--) {
-                // Пропускаем размеры, на которые длина строки не делится
-                if (idStr.length() % partSize != 0) {
+            // Iterate through all possible sequence lengths
+            for (int seqLength = idStr.length() / 2; seqLength >= 1; seqLength--) {
+                // Skip lengths that don't evenly divide the string
+                if (idStr.length() % seqLength != 0) {
                     continue;
                 }
 
-                // Проверяем, что все части одинаковые
-                int partsCount = idStr.length() / partSize;
-                boolean isAllPartsEqual = true;
-                String firstPart = idStr.substring(0, partSize);
-                for (int partIndex = 1; partIndex < partsCount; partIndex++) {
-                    if (!firstPart.equals(idStr.substring(partSize * partIndex, partSize * (partIndex + 1)))) {
-                        isAllPartsEqual = false;
+                // Check if all sequences are equal
+                int seqCount = idStr.length() / seqLength;
+                boolean isAllSeqEqual = true;
+                String firstPart = idStr.substring(0, seqLength);
+                for (int seqIndex = 1; seqIndex < seqCount; seqIndex++) {
+                    if (!firstPart.equals(idStr.substring(seqLength * seqIndex, seqLength * (seqIndex + 1)))) {
+                        isAllSeqEqual = false;
                         break;
                     }
                 }
 
-                // Все части одинаковые - ID невалидный
-                if (isAllPartsEqual) return false;
+                // All sequences are equal - ID is invalid
+                if (isAllSeqEqual) return false;
             }
 
-            // Не нашли повторяющихся подстрок - ID валидный
+            // No repeating sequences were found - ID is valid
             return true;
         });
     }

@@ -27,14 +27,14 @@ public class Day1 extends Day {
 
     @Override
     Integer part1() {
-        // Прибавляем 1, если диск после поворота будет в положении 0
+        // Increment by 1 if the dial is left pointing at 0 after rotation
         return getActualPassword((dial, rotation) -> (dial + rotation) % 100 == 0 ? 1 : 0);
     }
 
     @Override
     Integer part2() {
-        // Вычисляем, сколько полных оборотов пройдет диск после поворота
-        // К результату прибавляем 1, если диск после поворота будет в положении 0 или пройдет через 0
+        // Count full 360° turns
+        // Increment by 1 if the dial is left pointing at 0 after or during rotation
         return getActualPassword((dial, rotation) -> Math.abs((dial + rotation) / 100) + (dial == -rotation || dial * (dial + rotation) < 0 ? 1 : 0));
     }
 
