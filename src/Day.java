@@ -3,9 +3,11 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public abstract class Day {
+    private final String name;
     private final String filePath;
 
-    public Day(String filePath) {
+    public Day(String name, String filePath) {
+        this.name = name;
         this.filePath = filePath;
     }
 
@@ -25,9 +27,9 @@ public abstract class Day {
     public final void solve() {
         readFile();
         long startTime = System.nanoTime();
-        System.out.println("🎯 " + this.getClass().getName() + ":\n" +
-                "   ⭐ Part1: " + part1() + "\n" +
-                "   ⭐ Part2: " + part2() + "\n" +
+        System.out.println("🎯 " + name + "\n" +
+                "   ⭐ Part 1: " + part1() + "\n" +
+                "   ⭐ Part 2: " + part2() + "\n" +
                 "   📊 Benchmark: " + (double) ((System.nanoTime() - startTime) / 1000000) / 1000 + " мс");
     }
 

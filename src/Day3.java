@@ -6,7 +6,7 @@ public class Day3 extends Day {
     private final List<int[]> banks = new ArrayList<>();
 
     public Day3(String filePath) {
-        super(filePath);
+        super("Day 3: Lobby", filePath);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class Day3 extends Day {
                 max = bank[pos];
                 maxPos = pos;
             }
-            // There can't be a digit greater than 9, so we can stop here.
+            // There can't be a digit greater than 9, so we can stop here
             if (max == 9) {
                 break;
             }

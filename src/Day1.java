@@ -8,7 +8,7 @@ public class Day1 extends Day {
     private final List<Integer> rotations = new ArrayList<>();
 
     public Day1(String filePath) {
-        super(filePath);
+        super("Day 1: Secret Entrance", filePath);
     }
 
     @Override

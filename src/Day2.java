@@ -8,7 +8,7 @@ public class Day2 extends Day {
     private final List<long[]> ranges = new ArrayList<>();
 
     public Day2(String filePath) {
-        super(filePath);
+        super("Day 2: Gift Shop", filePath);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class Day2 extends Day {
     }
 
     @Override
-    Object part2() {
+    Long part2() {
         return getSumOfInvalidIds((idStr) -> {
             // Iterate through all possible sequence lengths
             for (int seqLength = idStr.length() / 2; seqLength >= 1; seqLength--) {
