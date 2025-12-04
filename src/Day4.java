@@ -43,22 +43,13 @@ public class Day4 extends Day {
     }
 
     private int getAdjacentRollsCount(int row, int col) {
-        int count = 0;
-        for (int j = col - 1; j <= col + 1; j++) {
-            if (j >= 0 && j <= grid.get(row).length - 1) {
-                if (row > 0 && grid.get(row - 1)[j] == 1) {
-                    count++;
-                }
-                if (row < grid.size() - 1 && grid.get(row + 1)[j] == 1) {
+        int count = -1;
+        for (int i = row - 1; i <= row + 1; i++) {
+            for (int j = col - 1; j <= col + 1; j++) {
+                if (i >= 0 && i < grid.size() && j >= 0 && j < grid.get(i).length && grid.get(i)[j] == 1) {
                     count++;
                 }
             }
-        }
-        if (col > 0 && grid.get(row)[col - 1] == 1) {
-            count++;
-        }
-        if (col < grid.get(row).length - 1 && grid.get(row)[col + 1] == 1) {
-            count++;
         }
         return count;
     }
