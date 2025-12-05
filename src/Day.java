@@ -5,6 +5,7 @@ import java.io.IOException;
 public abstract class Day {
     private final String name;
     private final String filePath;
+    private boolean isFailRead = false;
 
     public Day(String name, String filePath) {
         this.name = name;
@@ -12,11 +13,15 @@ public abstract class Day {
     }
 
     final void readFile() {
+        if (isFailRead) {
+            return;
+        }
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 processLine(line);
             }
+            isFailRead = true;
         } catch (IOException e) {
             System.err.println("Failed to read file: " + e.getMessage());
         }
