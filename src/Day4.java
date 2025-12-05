@@ -17,21 +17,30 @@ public class Day4 extends Day {
 
     @Override
     Integer part1() {
-        return getAccessedRollsCount(false);
+        return getAccessedRollsCount(grid, false);
     }
 
     @Override
     Integer part2() {
-        return IntStream.generate(() -> getAccessedRollsCount(true))
+        List<int[]> copy = makeGridCopy();
+        return IntStream.generate(() -> getAccessedRollsCount(copy, true))
                 .takeWhile(count -> count > 0)
                 .sum();
     }
 
-    private int getAccessedRollsCount(boolean withRemoval) {
+    private List<int[]> makeGridCopy() {
+        List<int[]> copy = new ArrayList<>();
+        grid.forEach(row -> {
+            copy.add(Arrays.copyOf(row, row.length));
+        });
+        return copy;
+    }
+
+    private int getAccessedRollsCount(List<int[]> grid, boolean withRemoval) {
         int count = 0;
         for (int i = 0; i < grid.size(); i++) {
             for (int j = 0; j < grid.get(i).length; j++) {
-                if (grid.get(i)[j] == 1 && getAdjacentRollsCount(i, j) < 4) {
+                if (grid.get(i)[j] == 1 && getAdjacentRollsCount(grid, i, j) < 4) {
                     count++;
                     if (withRemoval) {
                         grid.get(i)[j] = 0;
@@ -42,7 +51,7 @@ public class Day4 extends Day {
         return count;
     }
 
-    private int getAdjacentRollsCount(int row, int col) {
+    private int getAdjacentRollsCount(List<int[]> grid, int row, int col) {
         int count = -1;
         for (int i = row - 1; i <= row + 1; i++) {
             for (int j = col - 1; j <= col + 1; j++) {
