@@ -7,3 +7,4 @@
 | 3   | [Lobby](https://adventofcode.com/2025/day/3)               | [Source](src/Day3.java) | Recursion, Stream API             |
 | 4   | [Printing Department](https://adventofcode.com/2025/day/4) | [Source](src/Day4.java) | Deep Copy, Stream API             |
 | 5   | [Cafeteria](https://adventofcode.com/2025/day/5)           | [Source](src/Day5.java) | Stream API                        |
+| 6   | [Trash Compactor](https://adventofcode.com/2025/day/6)     | [Source](src/Day6.java) | Stream API                        |

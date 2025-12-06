@@ -3,9 +3,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Day5 extends Day {
-    boolean isId = false;
-    List<long[]> ranges = new ArrayList<>();
-    List<Long> ids = new ArrayList<>();
+    private boolean isId = false;
+    private final List<long[]> ranges = new ArrayList<>();
+    private final List<Long> ids = new ArrayList<>();
 
     public Day5(String filePath) {
         super("Day 5: Cafeteria", filePath);

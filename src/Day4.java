@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public class Day4 extends Day {
-    public final List<int[]> grid = new ArrayList<>();
+    private final List<int[]> grid = new ArrayList<>();
 
     public Day4(String filePath) {
         super("Day 4: Printing Department", filePath);
