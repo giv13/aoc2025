@@ -1,7 +1,6 @@
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class Day7 extends Day {
     private final List<char[]> diagram = new ArrayList<>();
@@ -48,22 +47,21 @@ public class Day7 extends Day {
         }
 
         int splits = 0;
-        Map<Integer, Long> beams = new HashMap<>();
-        beams.put(start[1], 1L);
+        long[] beams = new long[diagram.getFirst().length];
+        beams[start[1]] = 1L;
 
         for (int i = start[0] + 1; i < diagram.size(); i++) {
-            for (Map.Entry<Integer, Long> beam : new HashMap<>(beams).entrySet()) {
-                if (diagram.get(i)[beam.getKey()] == '^') {
-                    for (Integer key : new Integer[]{beam.getKey() - 1, beam.getKey() + 1}) {
-                        beams.compute(key, (k, v) -> (v == null ? 0L : v) + beam.getValue());
-                    }
-                    beams.remove(beam.getKey());
+            for (int j = 1; j < beams.length - 1; j++) {
+                if (beams[j] > 0 && diagram.get(i)[j] == '^') {
+                    beams[j - 1] += beams[j];
+                    beams[j + 1] += beams[j];
+                    beams[j] = 0L;
                     splits++;
                 }
             }
         }
 
-        result = new Result(splits, beams.values().stream().mapToLong(Long::longValue).sum());
+        result = new Result(splits, Arrays.stream(beams).sum());
         return result;
     }
 }
