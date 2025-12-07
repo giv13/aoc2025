@@ -7,7 +7,7 @@ public class Day6 extends Day {
     private final List<String> worksheet = new ArrayList<>();
 
     public Day6(String filePath) {
-        super("Trash Compactor", filePath);
+        super("Day 6: Trash Compactor", filePath);
     }
 
     @Override

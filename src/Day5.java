@@ -45,7 +45,7 @@ public class Day5 extends Day {
     }
 
     private void collapseRanges(List<long[]> ranges) {
-        for (int i = 0; i < ranges.size();) {
+        for (int i = 0; i < ranges.size(); ) {
             long[] range1 = ranges.get(i);
             boolean noCollapses = true;
             for (int j = ranges.size() - 1; j > i; j--) {
