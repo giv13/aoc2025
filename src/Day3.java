@@ -29,22 +29,24 @@ public class Day3 extends Day {
     }
 
     private long getMaxJoltage(int[] bank, int digitsNumber) {
-        return Long.parseLong(getMaxJoltage(bank, 0, digitsNumber));
-    }
+        int maxPos = -1;
+        long maxJoltage = 0L;
 
-    private String getMaxJoltage(int[] bank, int pos, int digitsNumber) {
-        int max = 0;
-        int maxPos = 0;
-        for (; pos <= bank.length - digitsNumber; pos++) {
-            if (bank[pos] > max) {
-                max = bank[pos];
-                maxPos = pos;
+        while (digitsNumber >= 1) {
+            int max = 0;
+            for (int pos = ++maxPos; pos <= bank.length - digitsNumber; pos++) {
+                if (bank[pos] > max) {
+                    max = bank[pos];
+                    maxPos = pos;
+                }
+                // There can't be a digit greater than 9, so we can stop here
+                if (max == 9) {
+                    break;
+                }
             }
-            // There can't be a digit greater than 9, so we can stop here
-            if (max == 9) {
-                break;
-            }
+            maxJoltage += max * (long) Math.pow(10, --digitsNumber);
         }
-        return max + (digitsNumber == 1 ? "" : getMaxJoltage(bank, maxPos + 1, digitsNumber - 1));
+
+        return maxJoltage;
     }
 }
