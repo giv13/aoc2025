@@ -35,7 +35,7 @@ public abstract class Day {
         System.out.println("🎯 " + name + "\n" +
                 "   ⭐ Part 1: " + part1() + "\n" +
                 "   ⭐ Part 2: " + part2() + "\n" +
-                "   📊 Benchmark: " + (double) ((System.nanoTime() - startTime) / 1000000) / 1000 + " мс");
+                "   📊 Benchmark: " + (System.nanoTime() - startTime) / 1000000 + " ms");
     }
 
     abstract Object part1();
