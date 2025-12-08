@@ -1,10 +1,9 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class Day4 extends Day {
-    private final List<int[]> grid = new ArrayList<>();
+    private final List<char[]> grid = new ArrayList<>();
+    private int[][] neighborCountMatrix;
 
     public Day4(String filePath) {
         super("Day 4: Printing Department", filePath);
@@ -12,51 +11,59 @@ public class Day4 extends Day {
 
     @Override
     void processLine(String line) {
-        grid.add(Arrays.stream(line.split("")).mapToInt(l -> l.equals("@") ? 1 : 0).toArray());
+        grid.add(line.toCharArray());
     }
 
     @Override
     Integer part1() {
-        return getAccessedRollsCount(grid, false);
-    }
-
-    @Override
-    Integer part2() {
-        List<int[]> copy = makeGridCopy();
-        return IntStream.generate(() -> getAccessedRollsCount(copy, true))
-                .takeWhile(count -> count > 0)
-                .sum();
-    }
-
-    private List<int[]> makeGridCopy() {
-        List<int[]> copy = new ArrayList<>();
-        grid.forEach(row -> {
-            copy.add(Arrays.copyOf(row, row.length));
-        });
-        return copy;
-    }
-
-    private int getAccessedRollsCount(List<int[]> grid, boolean withRemoval) {
         int count = 0;
-        for (int i = 0; i < grid.size(); i++) {
-            for (int j = 0; j < grid.get(i).length; j++) {
-                if (grid.get(i)[j] == 1 && getAdjacentRollsCount(grid, i, j) < 4) {
+        neighborCountMatrix = new int[grid.size()][grid.getFirst().length];
+        for (int i = 0; i < neighborCountMatrix.length; i++) {
+            for (int j = 0; j < neighborCountMatrix[i].length; j++) {
+                neighborCountMatrix[i][j] = grid.get(i)[j] == '@' ? countAdjacentRolls(i, j) : -1;
+                if (neighborCountMatrix[i][j] >= 0 && neighborCountMatrix[i][j] < 4) {
                     count++;
-                    if (withRemoval) {
-                        grid.get(i)[j] = 0;
-                    }
                 }
             }
         }
         return count;
     }
 
-    private int getAdjacentRollsCount(List<int[]> grid, int row, int col) {
+    @Override
+    Integer part2() {
+        int count = 0;
+        for (int i = 0; i < neighborCountMatrix.length; i++) {
+            for (int j = 0; j < neighborCountMatrix[i].length; j++) {
+                if (neighborCountMatrix[i][j] >= 0 && neighborCountMatrix[i][j] < 4) {
+                    count += removeRoll(i, j);
+                }
+            }
+        }
+        return count;
+    }
+
+    private int countAdjacentRolls(int row, int col) {
         int count = -1;
         for (int i = row - 1; i <= row + 1; i++) {
             for (int j = col - 1; j <= col + 1; j++) {
-                if (i >= 0 && i < grid.size() && j >= 0 && j < grid.get(i).length && grid.get(i)[j] == 1) {
+                if (i >= 0 && i < grid.size() && j >= 0 && j < grid.get(i).length && grid.get(i)[j] == '@') {
                     count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private int removeRoll(int row, int col) {
+        int count = 1;
+        neighborCountMatrix[row][col] = -1;
+        for (int i = row - 1; i <= row + 1; i++) {
+            for (int j = col - 1; j <= col + 1; j++) {
+                if ((i != 0 || j != 0) && i >= 0 && i < neighborCountMatrix.length && j >= 0 && j < neighborCountMatrix[i].length) {
+                    if (neighborCountMatrix[i][j] > 0) neighborCountMatrix[i][j] -= 1;
+                    if (neighborCountMatrix[i][j] >= 0 && neighborCountMatrix[i][j] < 4) {
+                        count += removeRoll(i, j);
+                    }
                 }
             }
         }

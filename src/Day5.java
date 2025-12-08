@@ -27,7 +27,7 @@ public class Day5 extends Day {
     @Override
     Integer part1() {
         int count = 0;
-        for (Long id : ids) {
+        for (long id : ids) {
             for (long[] range : ranges) {
                 if (id >= range[0] && id <= range[1]) {
                     count++;
