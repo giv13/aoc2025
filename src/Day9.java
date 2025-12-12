@@ -3,8 +3,8 @@ import java.util.*;
 public class Day9 extends Day {
     private int maxRow = 0;
     private int maxCol = 0;
-    private final List<Point> list = new ArrayList<>();
-    private final Queue<Square> squares = new PriorityQueue<>(Comparator.reverseOrder());
+    private final List<Point> points = new ArrayList<>();
+    private final Queue<Rect> rects = new PriorityQueue<>(Comparator.reverseOrder());
 
     public Day9(String filePath) {
         super("Day 9: Movie Theater", filePath);
@@ -15,26 +15,26 @@ public class Day9 extends Day {
         int[] point = Arrays.stream(line.split(",")).mapToInt(Integer::parseInt).toArray();
         maxRow = Math.max(maxRow, point[1]);
         maxCol = Math.max(maxCol, point[0]);
-        list.add(new Point(point[0], point[1]));
+        points.add(new Point(point[0], point[1]));
     }
 
     @Override
     Long part1() {
-        for (int i = 0; i < list.size(); i++) {
-            for (int j = i + 1; j < list.size(); j++) {
-                squares.add(new Square(list.get(i), list.get(j)));
+        for (int i = 0; i < points.size(); i++) {
+            for (int j = i + 1; j < points.size(); j++) {
+                rects.add(new Rect(points.get(i), points.get(j)));
             }
         }
-        return squares.peek() != null ? squares.peek().area : 0L;
+        return rects.peek() != null ? rects.peek().area : 0L;
     }
 
     @Override
     Long part2() {
-        SquareChecker squareChecker = new SquareChecker();
-        while (!squares.isEmpty()) {
-            Square square = squares.poll();
-            if (squareChecker.check(square)) {
-                return square.area;
+        RectChecker rectChecker = new RectChecker();
+        while (!rects.isEmpty()) {
+            Rect rect = rects.poll();
+            if (rectChecker.check(rect)) {
+                return rect.area;
             }
         }
         return 0L;
@@ -50,14 +50,14 @@ public class Day9 extends Day {
         }
     }
 
-    private static class Square implements Comparable<Square> {
+    private static class Rect implements Comparable<Rect> {
         private final int fromX;
         private final int toX;
         private final int fromY;
         private final int toY;
         private final long area;
 
-        private Square(Point p1, Point p2) {
+        private Rect(Point p1, Point p2) {
             this.fromX = Math.min(p1.x, p2.x);
             this.toX = Math.max(p1.x, p2.x);
             this.fromY = Math.min(p1.y, p2.y);
@@ -66,57 +66,70 @@ public class Day9 extends Day {
         }
 
         @Override
-        public int compareTo(Square other) {
+        public int compareTo(Rect other) {
             return Long.compare(area, other.area);
         }
     }
 
-    private class SquareChecker {
+    private class RectChecker {
         private final Edge[] edges;
+        private final Map<String, BitSet> cache = new HashMap<>();
 
-        private SquareChecker() {
-            int n = list.size();
+        private RectChecker() {
+            // For checks we need edges, not points
+            int n = points.size();
             edges = new Edge[n];
             for (int i = 0; i < n; i++) {
-                Point prev = list.get((i - 1 + n) % n);
-                Point current = list.get(i);
-                Point next = list.get((i + 1) % n);
-                Point nextNext = list.get((i + 2) % n);
+                Point prev = points.get((i - 1 + n) % n);
+                Point current = points.get(i);
+                Point next = points.get((i + 1) % n);
+                Point nextNext = points.get((i + 2) % n);
                 edges[i] = new Edge(prev, current, next, nextNext);
             }
         }
 
-        private boolean check(Square square) {
+        private boolean check(Rect rect) {
+            // Use BitSet so we can check the entire side of the rectangle at once without loops - THIS IS MUCH FASTER!
             BitSet mask = new BitSet();
-            mask.set(square.fromX, square.toX + 1);
-            mask.and(buildLine(square.fromY, true));
-            mask.and(buildLine(square.toY, true));
-            if (mask.cardinality() != square.toX - square.fromX + 1) {
+            mask.set(rect.fromX, rect.toX + 1);
+            mask.and(buildLine(rect.fromY, true));
+            mask.and(buildLine(rect.toY, true));
+            if (mask.cardinality() != rect.toX - rect.fromX + 1) {
                 return false;
             }
 
             mask = new BitSet();
-            mask.set(square.fromY, square.toY + 1);
-            mask.and(buildLine(square.fromX, false));
-            mask.and(buildLine(square.toX, false));
-            return mask.cardinality() == square.toY - square.fromY + 1;
+            mask.set(rect.fromY, rect.toY + 1);
+            mask.and(buildLine(rect.fromX, false));
+            mask.and(buildLine(rect.toX, false));
+            return mask.cardinality() == rect.toY - rect.fromY + 1;
         }
 
+        // Build a line with which we need to compare the side of the rectangle
         private BitSet buildLine(int row, boolean isHorizontal) {
-            BitSet line = new BitSet(isHorizontal ? maxRow : maxCol);
-            BitSet zShapes = new BitSet(isHorizontal ? maxRow : maxCol);
+            // If the line is in the cache, return it immediately
+            String key = (isHorizontal ? "H" : "V") + row;
+            BitSet line = cache.get(key);
+            if (line != null) {
+                return line;
+            }
 
+            // First, we mark the edges of the original polygon on the line
+            line = new BitSet();
+            Set<Integer> zShapedEdges = new HashSet<>(); // Save the starting points of the longitudinal Z-edges for quick checking
             for (Edge edge : edges) {
                 if (isHorizontal == edge.isHorizontal && edge.position == row) {
                     line.set(edge.from, edge.to + 1);
                     if (edge.isZShaped) {
-                        zShapes.set(edge.from);
+                        zShapedEdges.add(edge.from);
                     }
                 } else if (isHorizontal != edge.isHorizontal && edge.from < row && edge.to > row) {
                     line.set(edge.position);
                 }
             }
 
+            // Then we "paint" the tiles inside the polygon
+            // The main idea: A tile is inside a polygon if there is an odd number of transverse edges + longitudinal Z-edges to the left of it
             int count = 0;
             int pos = 0;
             while (true) {
@@ -124,7 +137,7 @@ public class Day9 extends Day {
                 int to = line.nextClearBit(from);
                 if (from == -1 || to == line.length()) break;
 
-                if (to - from == 1 || zShapes.get(from)) {
+                if (to - from == 1 || zShapedEdges.contains(from)) {
                     count++;
                 }
                 if (count % 2 == 1) {
@@ -137,6 +150,7 @@ public class Day9 extends Day {
                 pos = to + 1;
             }
 
+            cache.put(key, line);
             return line;
         }
 
@@ -145,7 +159,7 @@ public class Day9 extends Day {
             private final int from;
             private final int to;
             private final boolean isHorizontal;
-            private final boolean isZShaped;
+            private final boolean isZShaped; // Are adjacent edges pointing in different directions? If so, it's a Z-edge
 
             private Edge(Point prev, Point current, Point next, Point nextNext) {
                 if (current.x == next.x && current.y != next.y) {
