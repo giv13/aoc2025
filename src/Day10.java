@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
 public class Day10 extends Day {
@@ -34,7 +35,7 @@ public class Day10 extends Day {
         private final BitSet lightDiagram;
         private final BitSet[] buttonWiringSchematics;
         private final int[] joltageRequirements;
-        private final Map<BitSet, BitSet[][]> cache = new HashMap<>();
+        private final Map<BitSet, List<List<BitSet>>> cache = new ConcurrentHashMap<>();
 
         private Machine(BitSet lightDiagram, BitSet[] buttonWiringSchematics, int[] joltageRequirements) {
             this.lightDiagram = lightDiagram;
@@ -43,57 +44,73 @@ public class Day10 extends Day {
         }
 
         private int getMinPressesForLightDiagram() {
-            return Arrays.stream(getPossiblePressesStream(lightDiagram)).mapToInt(presses -> presses.length).min().orElse(0);
+            return getPossiblePresses(lightDiagram).stream().mapToInt(List::size).min().orElse(0);
         }
 
         private int getMinPressesForJoltageRequirements() {
-            return getMinPressesForJoltageRequirements(joltageRequirements);
+            return Optional.ofNullable(getMinPressesForJoltageRequirements(joltageRequirements)).orElse(0);
         }
 
-        private int getMinPressesForJoltageRequirements(int[] joltageRequirements) {
+        private Integer getMinPressesForJoltageRequirements(int[] joltageRequirements) {
             BitSet diagram = new BitSet();
+            boolean allZero = true;
             for (int i = 0; i < joltageRequirements.length; i++) {
+                if (joltageRequirements[i] < 0) {
+                    return null;
+                }
+                if (joltageRequirements[i] != 0) {
+                    allZero = false;
+                }
                 if (joltageRequirements[i] % 2 == 1) {
                     diagram.set(i);
                 }
             }
-            return Arrays.stream(getPossiblePressesStream(diagram)).mapToInt(presses -> {
+            if (allZero) {
+                return 0;
+            }
+
+            return getPossiblePresses(diagram).parallelStream().map(presses -> {
                 int[] newJoltageRequirements = Arrays.copyOf(joltageRequirements, joltageRequirements.length);
                 for (BitSet press : presses) {
-                    for (int i = 0; i < press.length(); i++) {
-                        if (press.get(i)) {
-                            newJoltageRequirements[i]--;
-                        }
+                    for (int i = press.nextSetBit(0); i >= 0; i = press.nextSetBit(i + 1)) {
+                        newJoltageRequirements[i]--;
                     }
-                }
-                if (Arrays.stream(newJoltageRequirements).anyMatch(element -> element < 0)) {
-                    return 10000;
-                }
-                if (Arrays.stream(newJoltageRequirements).allMatch(element -> element == 0)) {
-                    return presses.length;
                 }
                 for (int i = 0; i < newJoltageRequirements.length; i++) {
                     newJoltageRequirements[i] /= 2;
                 }
-                return presses.length + 2 * getMinPressesForJoltageRequirements(newJoltageRequirements);
-            }).min().orElse(10000);
+                Integer subResult = getMinPressesForJoltageRequirements(newJoltageRequirements);
+                if (subResult == null) {
+                    return null;
+                }
+                return presses.size() + 2 * subResult;
+            }).filter(Objects::nonNull).min(Integer::compare).orElse(null);
         }
 
-        private BitSet[][] getPossiblePressesStream(BitSet diagram) {
-            return cache.computeIfAbsent(diagram, d -> IntStream.range(0, 1 << buttonWiringSchematics.length)
-                    .mapToObj(mask -> IntStream.range(0, buttonWiringSchematics.length)
-                            .filter(i -> (mask & (1 << i)) != 0)
-                            .mapToObj(i -> buttonWiringSchematics[i])
-                            .toArray(BitSet[]::new)
-                    )
-                    .filter(presses -> Arrays.stream(presses)
-                            .reduce((BitSet) d.clone(), (a, b) -> {
-                                a.xor(b);
-                                return a;
-                            })
-                            .isEmpty()
-                    )
-                    .toArray(BitSet[][]::new));
+        private List<List<BitSet>> getPossiblePresses(BitSet diagram) {
+            return cache.computeIfAbsent(diagram, d -> {
+                List<List<BitSet>> possiblePresses = new ArrayList<>();
+                int n = buttonWiringSchematics.length;
+
+                for (int mask = 0; mask < (1 << n); mask++) {
+                    List<BitSet> presses = new ArrayList<>();
+                    for (int i = 0; i < n; i++) {
+                        if ((mask & (1 << i)) != 0) {
+                            presses.add(buttonWiringSchematics[i]);
+                        }
+                    }
+
+                    BitSet reduced = (BitSet) d.clone();
+                    for (BitSet press : presses) {
+                        reduced.xor(press);
+                    }
+                    if (reduced.isEmpty()) {
+                        possiblePresses.add(presses);
+                    }
+                }
+
+                return possiblePresses;
+            });
         }
     }
 }
