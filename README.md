@@ -10,5 +10,5 @@
 | 6   | [Trash Compactor](https://adventofcode.com/2025/day/6)     | [Source](src/Day6.java)  | Stream API                                                                       |
 | 7   | [Laboratories](https://adventofcode.com/2025/day/7)        | [Source](src/Day7.java)  | Records, Result Caching, Stream API                                              |
 | 8   | [Playground](https://adventofcode.com/2025/day/8)          | [Source](src/Day8.java)  | 3D Pythagorean theorem, Kruskal's algorithm,<br> Comparable, Records, Stream API |
-| 9   | [Movie Theater](https://adventofcode.com/2025/day/9)       | [Source](src/Day9.java)  | BitSet, PriorityQueue, Comparable, Nested Classes, Cache                         |
-| 10  | [Factory](https://adventofcode.com/2025/day/10)            | [Source](src/Day10.java) | BitSet, Recursion, Bitwise Operators, Stream API                                 |
+| 9   | [Movie Theater](https://adventofcode.com/2025/day/9)       | [Source](src/Day9.java)  | BitSet, Memoization, PriorityQueue, Comparable, Nested Classes                   |
+| 10  | [Factory](https://adventofcode.com/2025/day/10)            | [Source](src/Day10.java) | BitSet, Memoization, Recursion, Bitwise Operators, Stream API                    |

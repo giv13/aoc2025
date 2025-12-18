@@ -1,9 +1,5 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Day10 extends Day {
     List<Machine> machines = new ArrayList<>();
@@ -25,12 +21,12 @@ public class Day10 extends Day {
     }
 
     @Override
-    Object part1() {
+    Integer part1() {
         return machines.stream().mapToInt(Machine::getMinPressesForLightDiagram).sum();
     }
 
     @Override
-    Object part2() {
+    Integer part2() {
         return machines.stream().mapToInt(Machine::getMinPressesForJoltageRequirements).sum();
     }
 
@@ -38,6 +34,7 @@ public class Day10 extends Day {
         private final BitSet lightDiagram;
         private final BitSet[] buttonWiringSchematics;
         private final int[] joltageRequirements;
+        private final Map<BitSet, BitSet[][]> cache = new HashMap<>();
 
         private Machine(BitSet lightDiagram, BitSet[] buttonWiringSchematics, int[] joltageRequirements) {
             this.lightDiagram = lightDiagram;
@@ -46,7 +43,7 @@ public class Day10 extends Day {
         }
 
         private int getMinPressesForLightDiagram() {
-            return getPossiblePressesStream(lightDiagram).mapToInt(presses -> presses.length).min().orElse(0);
+            return Arrays.stream(getPossiblePressesStream(lightDiagram)).mapToInt(presses -> presses.length).min().orElse(0);
         }
 
         private int getMinPressesForJoltageRequirements() {
@@ -60,12 +57,12 @@ public class Day10 extends Day {
                     diagram.set(i);
                 }
             }
-            return getPossiblePressesStream(diagram).mapToInt(presses -> {
+            return Arrays.stream(getPossiblePressesStream(diagram)).mapToInt(presses -> {
                 int[] newJoltageRequirements = Arrays.copyOf(joltageRequirements, joltageRequirements.length);
-                for (int i = 0; i < presses.length; i++) {
-                    for (int j = 0; j < presses[i].length(); j++) {
-                        if (presses[i].get(j)) {
-                            newJoltageRequirements[j]--;
+                for (BitSet press : presses) {
+                    for (int i = 0; i < press.length(); i++) {
+                        if (press.get(i)) {
+                            newJoltageRequirements[i]--;
                         }
                     }
                 }
@@ -82,20 +79,21 @@ public class Day10 extends Day {
             }).min().orElse(10000);
         }
 
-        private Stream<BitSet[]> getPossiblePressesStream(BitSet diagram) {
-            return IntStream.range(0, 1 << buttonWiringSchematics.length)
+        private BitSet[][] getPossiblePressesStream(BitSet diagram) {
+            return cache.computeIfAbsent(diagram, d -> IntStream.range(0, 1 << buttonWiringSchematics.length)
                     .mapToObj(mask -> IntStream.range(0, buttonWiringSchematics.length)
                             .filter(i -> (mask & (1 << i)) != 0)
                             .mapToObj(i -> buttonWiringSchematics[i])
                             .toArray(BitSet[]::new)
                     )
                     .filter(presses -> Arrays.stream(presses)
-                            .reduce((BitSet) diagram.clone(), (a, b) -> {
+                            .reduce((BitSet) d.clone(), (a, b) -> {
                                 a.xor(b);
                                 return a;
                             })
                             .isEmpty()
-                    );
+                    )
+                    .toArray(BitSet[][]::new));
         }
     }
 }
