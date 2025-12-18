@@ -1,5 +1,5 @@
 public class Main {
-    private static final int DAYS_COUNT = 9;
+    private static final int DAYS_COUNT = 10;
 
     public static void main(String[] args) throws Exception {
         Day day;
