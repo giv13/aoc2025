@@ -12,3 +12,4 @@
 | 8   | [Playground](https://adventofcode.com/2025/day/8)          | [Source](src/Day8.java)  | 3D Pythagorean theorem, Kruskal's algorithm,<br> Comparable, Records, Stream API |
 | 9   | [Movie Theater](https://adventofcode.com/2025/day/9)       | [Source](src/Day9.java)  | BitSet, Memoization, PriorityQueue, Comparable, Nested Classes                   |
 | 10  | [Factory](https://adventofcode.com/2025/day/10)            | [Source](src/Day10.java) | BitSet, Memoization, Recursion, Bitwise Operators, Stream API                    |
+| 11  | [Reactor](https://adventofcode.com/2025/day/11)            | [Source](src/Day11.java) | Memoization, Recursion                                                           |
