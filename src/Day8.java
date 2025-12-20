@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 
 public class Day8 extends Day {
     private final List<junctionBox> junctionBoxes = new ArrayList<>();
-    private final List<Connection> connections = new ArrayList<>();
+    private final Queue<Connection> connections = new PriorityQueue<>();
     private Result result;
 
     public Day8(String filePath) {
@@ -55,7 +55,8 @@ public class Day8 extends Day {
             circuits.put(junctionBoxes.get(i), i);
         }
 
-        for (Connection connection : connections) {
+        while (!connections.isEmpty()) {
+            Connection connection = connections.poll();
             Integer cid1 = circuits.get(connection.box1());
             Integer cid2 = circuits.get(connection.box2());
 
@@ -101,6 +102,5 @@ public class Day8 extends Day {
                 connections.add(new Connection(junctionBoxes.get(i), junctionBoxes.get(j), distance));
             }
         }
-        Collections.sort(connections);
     }
 }
